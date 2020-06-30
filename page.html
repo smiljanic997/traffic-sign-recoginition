@@ -1,0 +1,108 @@
+<html>
+
+<head>
+    <title>Traffic Sign Recognition System</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <style type="text/css">
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1.6fr 0.4fr;
+            grid-template-rows: 0.2fr 2.6fr 0.2fr;
+            gap: 3px 3px;
+            grid-template-areas: "stream_name preds_name""stream_placeholder predicted_signs""Authors Subject";
+        }
+
+        .authors {
+            position: fixed;
+            text-align: left;
+            bottom: 0px;
+            width: 100%;
+        }
+
+        .subject_name {
+            position: fixed;
+            text-align: right;
+            bottom: 0px;
+            /* width: 100%; */
+        }
+
+        .predicted_signs {
+            grid-area: predicted_signs;
+        }
+
+        .stream_placeholder {
+            grid-area: stream_placeholder;
+            text-align: center;
+        }
+
+        .stream_name {
+            grid-area: stream_name;
+        }
+
+        .preds_name {
+            grid-area: preds_name;
+        }
+
+        .Authors {
+            grid-area: Authors;
+        }
+
+        .Subject {
+            grid-area: Subject;
+        }
+
+        .helper {
+            display: inline-block;
+            height: 100px;
+        }
+
+        hr {
+            display: block;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            margin-left: auto;
+            margin-right: auto;
+            border-style:solid;
+            border-width: 5px;
+        }
+    </style>
+
+</head>
+<center>
+    <h1>Prepoznavanje saobraćajnih znakova</h1>
+</center>
+<hr>
+<div class="grid-container">
+    <div class="predicted_signs">
+        <div>
+            <span class="helper" style="margin-bottom: 10px;"></span><img src="first_pred.png" alt="Predicted sign" width="100" height="100"
+                style="float: left; margin-left: 15px;">
+
+        </div>
+        <!-- <div>
+            <span class="helper" style="margin-bottom: 10px;"></span><img src="testing.png" alt="Predicted sign" width="100" height="100"
+                style="float: left; margin-left: 15px;">
+
+        </div> -->
+        <div>
+            <span class="helper" style="margin-top: 10px;"></span><img src="second_pred.png" alt="Predicted sign" width="100" height="100"
+                style="float: left; margin-left: 15px;">
+
+        </div>
+        <div>
+            <span class="helper"></span><img src="third_pred.png" alt="Predicted sign" width="100" height="100"
+                style="float:left; margin-left: 15px;">
+        </div>
+    </div>
+    <div class="stream_placeholder"><img src="stream.mjpg" width="640" height="480"></div>
+
+
+    <div class="stream_name" style="text-align: center;"></div>
+    <div class="preds_name" style="text-align: left;">Prepoznati znakovi</div>
+    <div class="Authors">
+        <div class="authors">Aleksandar Ritan 1150/14<br>Slaven Smiljanić 1104/16</div>>
+    </div>
+    <div class="Subject" style="margin-top: 35px;">Multimedijalni signali i sistemi 2019/20</div>
+</div>
+
+</html>
