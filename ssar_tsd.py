@@ -18,7 +18,7 @@ class TrafficSignDetector:
         # The pretrained neural network model for traffic sign classification is loaded
         self.__run_on_coral = run_on_coral
         if run_on_coral == False:
-            self.__model = load_model('model2.h5')
+            self.__model = load_model('small_ssar_tsd.h5')
         else:
             self.interpreter = self.__make_interpreter()
             self.interpreter.allocate_tensors()
