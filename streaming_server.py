@@ -10,8 +10,11 @@ import codecs
 from copy import deepcopy
 from video_get import VideoGet
 from datetime import datetime
+import logging
 
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Importing detection module(takes few seconds)')
+logging.basicConfig(level=logging.INFO, format='%(levelname)s {} : %(message)s'.format(datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
+
+logging.info('Importing detection module(takes few seconds)')
 import ssar_tsd
 
 import cv2
@@ -24,35 +27,40 @@ lock = threading.RLock()
 current_frame = None
 
 
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Setting up RPi camera')
+logging.info('Setting up RPi camera')
 vg = VideoGet(resolution=(960, 720), framerate=24)
 vg.start()
+time.sleep(2)
 
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Creating detector object')
+logging.info('Creating detector object')
 detector = ssar_tsd.TrafficSignDetector()
 
 def reading():
+    """Function that reads frames from camera module."""
     global current_frame
     while True:
         with lock:
             current_frame = vg.read()
 
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Starting camera reading')
+
+logging.info('Starting camera reading')
 reading_thread = threading.Thread(target=reading, args=())
 reading_thread.daemon = True
 reading_thread.start()
 
 def get_predictions(detector):
+    """Gets predictions from predictor module. 
+       Lock is used to guarantee that the frame
+       won't change during deepcopy function call.
+    """
     global predictions
     while True:
         with lock:
             cur_frame = deepcopy(current_frame)
-        # frame = cv2.cvtColor(vg.read(), cv2.COLOR_BGR2RGB)
         cur_frame = cv2.cvtColor(cur_frame, cv2.COLOR_BGR2RGB)
         predictions = detector.predict(cur_frame)
         print(predictions)
     
-
 class StreamingHandler(server.BaseHTTPRequestHandler):
     
     def do_GET(self):
@@ -180,34 +188,12 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     daemon_threads = True
 
 
-
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Starting processing thread')
+logging.info('Starting processing thread')
 ext_frame_thread = threading.Thread(target=get_predictions, args=(detector,))
 ext_frame_thread.daemon = True
 ext_frame_thread.start()
 
-# detector2 = ssar_tsd.TrafficSignDetector()
-# ext_frame_thread2 = threading.Thread(target=get_predictions, args=(detector2,))
-# ext_frame_thread2.daemon = True
-# ext_frame_thread2.start()
-
-# vg = VideoGet(resolution=(960, 720), framerate=24)
-# vg.start()
-
-# time.sleep(2)
-
-# while True:
-#     # with cond:
-#     frame = vg.read()
-#         # cond.notify_all()
-#     cv2.imshow('frames', frame)
-#     if cv2.waitKey(1) & 0xFF == ord('q'):
-#         vg.stop()
-#         break
-
-# cv2.destroyAllWindows()
-
-print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), ': Setting up server')
+logging.info('Setting up server')
 try:
     address = ('', 2105)
     server = StreamingServer(address, StreamingHandler)
