@@ -1,8 +1,6 @@
 import io
-import picamera
 import logging
 import socketserver
-from threading import Condition
 from http import server
 import threading
 import time
@@ -10,7 +8,6 @@ import codecs
 from copy import deepcopy
 from video_get import VideoGet
 from datetime import datetime
-import logging
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s {} : %(message)s'.format(datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
 
@@ -33,7 +30,7 @@ vg.start()
 time.sleep(2)
 
 logging.info('Creating detector object')
-detector = ssar_tsd.TrafficSignDetector()
+detector = ssar_tsd.TrafficSignDetector(run_on_coral=True)
 
 def reading():
     """Function that reads frames from camera module."""

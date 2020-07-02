@@ -1,11 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import deque
-from copy import deepcopy
 from tensorflow.keras.models import load_model
 from PIL import Image
 import cv2
-import tensorflow.lite as tflite
 import collections
 import operator
 from tflite_runtime.interpreter import load_delegate
@@ -18,7 +15,7 @@ class TrafficSignDetector:
         # The pretrained neural network model for traffic sign classification is loaded
         self.__run_on_coral = run_on_coral
         if run_on_coral == False:
-            self.__model = load_model('small_ssar_tsd.h5')
+            self.__model = load_model('ssar_tsd_model0_no_aug.h5')
         else:
             self.interpreter = self.__make_interpreter()
             self.interpreter.allocate_tensors()
@@ -177,16 +174,14 @@ class TrafficSignDetector:
             11: 19, 12: 2, 13: 20, 14: 21, 15: 22, 16: 23, 17: 24, 18: 25, 19: 26, 20: 27,
             21: 28, 22: 29, 23: 3, 24: 30, 25: 31, 26: 32, 27: 33, 28: 34, 29: 35, 30: 36,
             31: 37, 32: 38, 33: 39, 34: 4, 35: 40, 36: 41, 37: 5, 38: 6, 39: 7, 40: 8, 41: 9
-            }
+        }
 
         for region in red_regions:
-            # predicted_class = self.__predict_class(region)
-            predicted_class = dictt[int(self.__predict_class_on_TPU(region)[0][0])]
+            predicted_class = dictt[int(self.__predict_class_on_TPU(region)[0][0])] if self.__run_on_coral == True else self.__predict_class(region)
             self.__class_count[int(predicted_class)] += 1
             predicted_classes.append(predicted_class)
         for region in blue_regions:
-            # predicted_class = self.__predict_class(region)
-            predicted_class = dictt[int(self.__predict_class_on_TPU(region)[0][0])]
+            predicted_class = dictt[int(self.__predict_class_on_TPU(region)[0][0])] if self.__run_on_coral == True else self.__predict_class(region)
             self.__class_count[int(predicted_class)] += 1
             predicted_classes.append(predicted_class)
 
@@ -201,14 +196,10 @@ class TrafficSignDetector:
         keys = []
         values = []
         for k, v in self.__class_count.items():
+            # 0.7 means that 70% of buffer has to contain the same sign for it to be returned
             if v >= np.round(self.__num_frames * 0.7):
                 keys.append(k)
                 values.append(v)
 
+        # sort and return up to 3 signs(this could be empty list)
         return [k for _, k in sorted(zip(values, keys), key=lambda pair: pair[0])][:3]
-
-    def get_num_of_frames(self):
-        return self.__num_frames
-
-    def set_num_of_frames(self, num):
-        self.__num_frames = num
